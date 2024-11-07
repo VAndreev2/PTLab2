@@ -2,25 +2,40 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Товары</title>
+    <title>Магазин мягкой мебели</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'shop/css/main.css' %}">
 </head>
 <body>
-    <div>
-        <h3>Список</h3>
-        <table>
-            <tr>
-                <td><p>Наименование</p></td>
-                <td><p>Цена</p></td>
-                <td></td>
-            </tr>
+    <div class="container text-center py-4">
+        <h3>Магазин мягкой мебели</h3>
+        <table class="table products-table">
+            <thead>
+                <tr>
+                    <th class="text-start">Наименование</th>
+                    <th class="text-end">Цена</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
             {% for p in products %}
                 <tr>
-                    <td><p>{{ p.name }}</p></td>
-                    <td><p>{{ p.price }}</p></td>
-                    <td><p><a href="/buy/{{ p.id }}">Купить</a></p></td>
+                    <td class="text-start"><p>{{ p.name|safe }}</p></td>
+                    <td class="text-end"><p>{{ p.price }} ₽</p></td>
+                    <td><a href="#" class="add-to-cart" data-price="{{ p.price }}" buy-id="{{ p.id }}">В корзину</a></td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
+
+        <div class="cart-row d-flex justify-content-between align-items-center">
+            <span><b>Корзина:</b></span>
+            <span id="cart-total">0 ₽</span>
+        </div>
+
+        <button class="btn btn-primary make-purchase">Оформить покупку</button>
     </div>
+    <script src="{% static 'shop/js/purchase.js' %}"></script>
 </body>
 </html>
