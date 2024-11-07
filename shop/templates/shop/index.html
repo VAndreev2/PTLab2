@@ -2,78 +2,40 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Товары</title>
+    <title>Магазин мягкой мебели</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'shop/css/main.css' %}">
 </head>
 <body>
-    <div>
-        <h3>Список</h3>
-        <table>
-            <tr>
-                <td><p>Наименование</p></td>
-                <td><p>Цена</p></td>
-                <td></td>
-            </tr>
+    <div class="container text-center py-4">
+        <h3>Магазин мягкой мебели</h3>
+        <table class="table products-table">
+            <thead>
+                <tr>
+                    <th class="text-start">Наименование</th>
+                    <th class="text-end">Цена</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
             {% for p in products %}
                 <tr>
-                    <td><p>{{ p.name|safe }}</p></td>
-                    <td><p>{{ p.price }}</p></td>
-                    <td><p><a href="#" class="add-to-cart" data-price="{{ p.price }}" buy-id="{{ p.id }}">В корзину</a></p></td>
+                    <td class="text-start"><p>{{ p.name|safe }}</p></td>
+                    <td class="text-end"><p>{{ p.price }} ₽</p></td>
+                    <td><a href="#" class="add-to-cart" data-price="{{ p.price }}" buy-id="{{ p.id }}">В корзину</a></td>
                 </tr>
             {% endfor %}
+            </tbody>
         </table>
-        <table>
-            <tr>
-                <td><b>Корзина: </b></td>
-                <td><p id="cart-total">0 ₽</p></td>
-            </tr>
-        </table>
-        <button class="make-purchase">Оформить покупку</button>
+
+        <div class="cart-row d-flex justify-content-between align-items-center">
+            <span><b>Корзина:</b></span>
+            <span id="cart-total">0 ₽</span>
+        </div>
+
+        <button class="btn btn-primary make-purchase">Оформить покупку</button>
     </div>
-    <script>
-        // Инициализируем переменные
-        let total = 0;
-        const cartItems = new Set(); // Используем Set для хранения уникальных идентификаторов товаров
-
-        // Находим все кнопки "В корзину"
-        const addToCartButtons = document.querySelectorAll('.add-to-cart');
-        const makePurchaseButton = document.querySelector('.make-purchase');
-
-        // Обрабатываем клик по каждой кнопке "В корзину"
-        addToCartButtons.forEach(button => {
-            button.addEventListener('click', function(event) {
-                event.preventDefault();  // Предотвращаем переход по ссылке
-
-                // Получаем цену товара из атрибута data-price
-                const price = parseInt(this.getAttribute('data-price'));
-                const buy_id = parseInt(this.getAttribute('buy-id'));
-
-                // Проверяем, добавлен ли товар в корзину
-                if (cartItems.has(buy_id)) {
-                    alert("Экземпляр товара уже находится в корзине. Повторное добавление невозможно.");
-                } else {
-                    // Добавляем товар в корзину
-                    cartItems.add(buy_id);
-                    console.log(cartItems);
-                    total += price; // Суммируем стоимость
-
-                    // Обновляем текст в элементе с id="cart-total"
-                    document.getElementById('cart-total').textContent = total + ' рублей';
-                }
-            });
-        });
-
-        // Обрабатываем клик по кнопке "Оформить покупку"
-        makePurchaseButton.addEventListener('click', function(event) {
-            event.preventDefault();
-            if (cartItems.size > 0) {
-                // Преобразуем Set в массив и создаем строку с идентификаторами товаров
-                const productIds = Array.from(cartItems).join(',');
-                // Переход по ссылке с использованием идентификаторов товаров
-                window.location.href = `/buy/${productIds}`;
-            } else {
-                alert("Выберите товар для покупки.");
-            }
-        });
-    </script>
+    <script src="{% static 'shop/js/purchase.js' %}"></script>
 </body>
 </html>
