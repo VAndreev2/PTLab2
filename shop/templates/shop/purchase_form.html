@@ -2,27 +2,46 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Покупка</title>
+    <title>Магазин мягкой мебели</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'shop/css/main.css' %}">
 </head>
-<body>
-    <div>
-        <h3>Покупка</h3>
-        <form method="post">{% csrf_token %}
-            <input type="hidden" value="{{ product_ids }}" name="product_ids" />
-            <table>
-                <tr>
-                    <td><p>Введите свое имя </p></td>
-                    <td><input type="text" name="person" required /> </td>
-                </tr>
-                <tr>
-                    <td><p>Введите адрес доставки:</p></td>
-                    <td>
-                        <input type="text" name="address" required />
-                    </td>
-                </tr>
-                <tr><td><input type="submit" value="Отправить" /> </td><td></td></tr>
-            </table>
-        </form>
+<body class="bg-light">
+    <div class="container">
+        <div class="row min-vh-100 justify-content-center align-items-center">
+            <div class="col-12 col-md-6">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h3 class="text-center mb-4">Оформление заказа</h3>
+                        <form method="post">{% csrf_token %}
+                            <input type="hidden" id="product-ids" name="product_ids" />
+                            <input type="hidden" class="form-control" id="total-cost" name="total_cost" />
+                            <div class="mb-3">
+                                <label class="form-label">Введите свое имя</label>
+                                <input type="text" class="form-control" name="person" required/>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Введите адрес доставки</label>
+                                <input type="text" class="form-control" name="address" required/>
+                            </div>
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary">Отправить</button>
+                            </div>
+                        </form>
+                    <div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const path = window.location.pathname;
+        const parts = path.split('&');
+        let ids = parts[0].replace('/buy/', '');
+        let total = parts[1] ? parts[1].replace(/\/$/, '') : '';
+        document.getElementById('product-ids').value = ids;
+        document.getElementById('total-cost').value = total;
+    </script>
 </body>
 </html>
