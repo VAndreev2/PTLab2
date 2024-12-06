@@ -23,19 +23,26 @@
                 <tr>
                     <td class="text-start"><p>{{ p.name|safe }}</p></td>
                     <td class="text-end"><p>{{ p.price }} ₽</p></td>
-                    <td><a href="#" class="add-to-cart" data-price="{{ p.price }}" buy-id="{{ p.id }}">В корзину</a></td>
+                    <td><a href="{% url 'add_to_cart' p.id %}">В корзину</a></td>
                 </tr>
             {% endfor %}
             </tbody>
         </table>
 
-        <div class="cart-row d-flex justify-content-between align-items-center">
-            <span><b>Корзина:</b></span>
-            <span id="cart-total">0 ₽</span>
-        </div>
+       <h4>Корзина:</h4>
+        <ul>
+            {% for item in cart_items %}
+                <li>
+                    {{ item.product.name }} - {{ item.quantity }} шт. ({{ item.product.price }} ₽ за штуку)
+                    <a href="{% url 'remove_from_cart' item.product.id %}">Удалить</a>
+                </li>
+            {% empty %}
+                <li>Корзина пуста</li>
+            {% endfor %}
+        </ul>
+        <p>Итог: {{ total_price }} ₽</p>
 
-        <button class="btn btn-primary make-purchase">Оформить покупку</button>
+        <a href="{% url 'purchase' %}" class="btn btn-primary">Оформить покупку</a>
     </div>
-    <script src="{% static 'shop/js/purchase.js' %}"></script>
 </body>
 </html>

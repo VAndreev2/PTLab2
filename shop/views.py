@@ -1,14 +1,44 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.views.generic.edit import CreateView
 
-from .models import Product, Purchase
+from .models import Product, Purchase, CartItem
 
-# Create your views here.
+
+# Главная страница с товарами
 def index(request):
     products = Product.objects.all()
-    context = {'products': products}
+    cart = request.session.get('cart', {})
+    cart_items = [
+        {'product': Product.objects.get(id=int(product_id)),}
+        for product_id in cart
+    ]
+    total_price = sum(item['product'].price for item in cart_items)
+    context = {
+        'products': products,
+        'cart_items': cart_items,
+        'total_price': total_price,
+    }
     return render(request, 'shop/index.html', context)
+
+# Добавить товар в корзину
+def add_to_cart(request, product_id):
+    cart = request.session.get('cart', {})
+
+    # Добавляем товар в корзину, если его там нет
+    if str(product_id) not in cart:
+        cart[str(product_id)] = 1  # Устанавливаем количество товара как 1
+
+    request.session['cart'] = cart
+    return redirect('index')
+
+# Удалить товар из корзины
+def remove_from_cart(request, product_id):
+    cart = request.session.get('cart', {})
+    if str(product_id) in cart:
+        del cart[str(product_id)]
+    request.session['cart'] = cart
+    return redirect('index')
 
 
 class PurchaseCreate(CreateView):
@@ -16,20 +46,29 @@ class PurchaseCreate(CreateView):
     fields = ['person', 'address']
 
     def dispatch(self, request, *args, **kwargs):
-        # Получаем product_ids из URL
-        self.product = self.request.POST.get('product_ids')
-        self.total_cost = self.request.POST.get('total_cost')  # total_cost
+        # Получаем cart из сессии
+        self.cart = request.session.get('cart', {})
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
-        # Проверка наличия product_ids
-        if not self.product:
-            return HttpResponse("Не указаны товары для покупки.", status=400)
+        # Проверка наличия товаров в корзине
+        if not self.cart:
+            return HttpResponse("Корзина пуста.", status=400)
 
-        # Заполняем поле product_ids в форме
-        form.instance.product = self.product  # Сохраняем список продуктов как строку
-        form.instance.total_cost = self.total_cost
+        # Сохраняем объект Purchase
+        form.instance.total_cost = sum(
+            Product.objects.get(id=int(product_id)).price
+            for product_id in self.cart.keys()
+        )
         self.object = form.save()  # Сохраняем объект в базе данных
+
+        # Создаем записи в CartItem для каждого товара в корзине
+        for product_id in self.cart.keys():
+            product = Product.objects.get(id=int(product_id))
+            CartItem.objects.create(product=product, purchase=self.object)
+
+        # Очищаем корзину в сессии
+        self.request.session['cart'] = {}
 
         # Форматируем дату без времени
         formatted_date = self.object.date.strftime('%b %d, %Y')  # Например, "Nov 07, 2024"

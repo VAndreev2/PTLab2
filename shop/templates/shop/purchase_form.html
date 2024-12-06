@@ -34,14 +34,5 @@
             </div>
         </div>
     </div>
-
-    <script>
-        const path = window.location.pathname;
-        const parts = path.split('&');
-        let ids = parts[0].replace('/buy/', '');
-        let total = parts[1] ? parts[1].replace(/\/$/, '') : '';
-        document.getElementById('product-ids').value = ids;
-        document.getElementById('total-cost').value = total;
-    </script>
 </body>
 </html>
