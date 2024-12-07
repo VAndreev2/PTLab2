@@ -20,6 +20,15 @@ class PurchaseCreateTestCase(TestCase):
         self.assertIn('cart', self.client.session)
         self.assertEqual(self.client.session['cart'][str(self.product_book.id)], 1)
 
+    def test_add_to_cart_double(self):
+        response = self.client.post(reverse('add_to_cart', args=[self.product_book.id]))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn('cart', self.client.session)
+        response = self.client.post(reverse('add_to_cart', args=[self.product_book.id]))
+        self.assertEqual(response.status_code, 302)  # Ожидаем перенаправление
+        self.assertIn('cart', self.client.session)
+        self.assertEqual(self.client.session['cart'][str(self.product_book.id)], 1)
+
     def test_purchase_creation_valid(self):
         # Добавляем товар в корзину
         self.client.post(reverse('add_to_cart', args=[self.product_book.id]))
